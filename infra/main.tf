@@ -15,7 +15,6 @@ provider "newrelic" {
 resource "newrelic_one_dashboard" "dashboard" {
   name = "Medium Article Dashboard"
 
-  # Only I can see this dashboard
   permissions = "private"
 
   page {
