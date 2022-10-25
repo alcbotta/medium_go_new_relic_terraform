@@ -8,8 +8,8 @@ terraform {
 
 provider "newrelic" {
   account_id = var.NEW_RELIC_ACCOUNT_ID
-  api_key    = var.NEW_RELIC_API_KEY # usually prefixed with 'NRAK'
-  region     = var.NEW_RELIC_REGION                               # Valid regions are US and EU
+  api_key    = var.NEW_RELIC_API_KEY 
+  region     = var.NEW_RELIC_REGION                               
 }
 
 resource "newrelic_one_dashboard" "dashboard" {
@@ -44,30 +44,5 @@ resource "newrelic_one_dashboard" "dashboard" {
         query = "SELECT count(*) from Transaction FACET httpResponseCode where appName='${var.APP_NAME}' since 30 minutes ago limit 10 "
       }
     }
-  }
-}
-# https://newrelic.com/blog/best-practices/advanced-nrql
-# https://discuss.newrelic.com/t/relic-solution-extending-the-functionality-of-nrql-alert-conditions-beyond-a-single-minute/75441
-# https://registry.terraform.io/providers/newrelic/newrelic/latest/docs/resources/alert_policy
-resource "newrelic_alert_policy" "special_alert_policy" {
-  name = "special_alert_policy"
-}
-
-resource "newrelic_nrql_alert_condition" "special_alert_condition" {
-  policy_id                      = newrelic_alert_policy.special_alert_policy.id
-  type                           = "static"
-  name                           = "special_alert_policy"
-  enabled                        = true
-  
-
-  nrql {
-    query = "SELECT count(*) from TransactionError where appName='${var.APP_NAME}' and error.class='SpecialError'"
-  }
-
-  critical {
-    threshold_duration = 60
-    operator              = "above_or_equals"
-    threshold             = 1
-    threshold_occurrences = "AT_LEAST_ONCE"
   }
 }
